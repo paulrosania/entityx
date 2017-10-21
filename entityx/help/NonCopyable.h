@@ -5,6 +5,10 @@
 namespace entityx {
 namespace help {
 
+#define NONCOPYABLE(Class)                \
+  Class(const Class&) = delete;           \
+  Class& operator=(const Class&) = delete
+
 class NonCopyable {
 protected:
   NonCopyable() = default;

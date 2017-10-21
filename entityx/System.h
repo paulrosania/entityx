@@ -30,8 +30,11 @@ class SystemManager;
 /**
  * Base System class. Generally should not be directly used, instead see System<Derived>.
  */
-class BaseSystem : entityx::help::NonCopyable {
+class BaseSystem {
  public:
+  BaseSystem() = default;
+  NONCOPYABLE(BaseSystem);
+
   typedef size_t Family;
 
   virtual ~BaseSystem();
@@ -87,12 +90,13 @@ private:
 };
 
 
-class SystemManager : entityx::help::NonCopyable {
+class SystemManager {
  public:
   SystemManager(EntityManager &entity_manager,
                 EventManager &event_manager) :
                 entity_manager_(entity_manager),
                 event_manager_(event_manager) {}
+  NONCOPYABLE(SystemManager);
 
   /**
    * Add a System to the SystemManager.

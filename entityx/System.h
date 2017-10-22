@@ -37,7 +37,7 @@ class BaseSystem {
 
   typedef size_t Family;
 
-  virtual ~BaseSystem();
+  virtual ~BaseSystem() = default;
 
   /**
    * Called once all Systems have been added to the SystemManager.
@@ -78,7 +78,7 @@ class BaseSystem {
 template <typename Derived>
 class System : public BaseSystem {
  public:
-  virtual ~System() {}
+  virtual ~System() = default;
 
 private:
   friend class SystemManager;

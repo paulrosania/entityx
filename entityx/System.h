@@ -34,9 +34,6 @@ class BaseSystem {
  public:
   BaseSystem() = default;
   NONCOPYABLE(BaseSystem);
-
-  typedef size_t Family;
-
   virtual ~BaseSystem() = default;
 
   /**
@@ -59,10 +56,6 @@ class BaseSystem {
    * Called every game step.
    */
   virtual void update(EntityManager &entities, EventManager &events, TimeDelta dt) = 0;
-
-  static Family family_counter_;
-
- protected:
 };
 
 
@@ -82,11 +75,6 @@ class System : public BaseSystem {
 
 private:
   friend class SystemManager;
-
-  static Family family() {
-    static Family family = family_counter_++;
-    return family;
-  }
 };
 
 
@@ -109,7 +97,7 @@ class SystemManager {
    */
   template <typename S>
   void add(std::shared_ptr<S> system) {
-    systems_.insert(std::make_pair(S::family(), system));
+    systems_.emplace_back(system);
   }
 
   /**
@@ -128,41 +116,9 @@ class SystemManager {
   }
 
   /**
-   * Retrieve the registered System instance, if any.
-   *
-   *   std::shared_ptr<CollisionSystem> collisions = systems.system<CollisionSystem>();
-   *
-   * @return System instance or empty shared_std::shared_ptr<S>.
-   */
-  template <typename S>
-  std::shared_ptr<S> system() {
-    auto it = systems_.find(S::family());
-    assert(it != systems_.end());
-    return it == systems_.end()
-        ? std::shared_ptr<S>()
-        : std::shared_ptr<S>(std::static_pointer_cast<S>(it->second));
-  }
-
-  /**
-   * Call the System::update() method for a registered system.
-   */
-  template <typename S>
-  void update(TimeDelta dt) {
-    assert(initialized_ && "SystemManager::configure() not called");
-    std::shared_ptr<S> s = system<S>();
-    s->update(entity_manager_, event_manager_, dt);
-  }
-
-  /**
    * Call System::update() on all registered systems.
    *
-   * The order which the registered systems are updated is arbitrary but consistent,
-   * meaning the order which they will be updated cannot be specified, but that order
-   * will stay the same as long no systems are added or removed.
-   *
-   * If the order in which systems update is important, use SystemManager::update()
-   * to manually specify the update order. EntityX does not yet support a way of
-   * specifying priority for update_all().
+   * Systems are updated in the order they are registered.
    */
   void update_all(TimeDelta dt);
 
@@ -177,7 +133,7 @@ class SystemManager {
   bool initialized_ = false;
   EntityManager &entity_manager_;
   EventManager &event_manager_;
-  std::unordered_map<BaseSystem::Family, std::shared_ptr<BaseSystem>> systems_;
+  std::vector<std::shared_ptr<BaseSystem>> systems_;
 };
 
 }  // namespace entityx

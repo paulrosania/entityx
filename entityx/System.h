@@ -92,12 +92,12 @@ class SystemManager {
    * Must be called before Systems can be used.
    *
    * eg.
-   * std::shared_ptr<MovementSystem> movement = entityx::make_shared<MovementSystem>();
-   * system.add(movement);
+   * std::unique_ptr<MovementSystem> movement = entityx::make_unique<MovementSystem>();
+   * system.add(std::move(movement));
    */
   template <typename S>
-  void add(std::shared_ptr<S> system) {
-    systems_.emplace_back(system);
+  void add(std::unique_ptr<S> system) {
+    systems_.emplace_back(std::move(system));
   }
 
   /**
@@ -109,9 +109,9 @@ class SystemManager {
    * auto movement = system.add<MovementSystem>();
    */
   template <typename S, typename ... Args>
-  std::shared_ptr<S> add(Args && ... args) {
-    std::shared_ptr<S> s(new S(std::forward<Args>(args) ...));
-    add(s);
+  S* add(Args && ... args) {
+    auto s = new S(std::forward<Args>(args) ...);
+    add(std::unique_ptr<S>(s));
     return s;
   }
 
@@ -133,7 +133,7 @@ class SystemManager {
   bool initialized_ = false;
   EntityManager &entity_manager_;
   EventManager &event_manager_;
-  std::vector<std::shared_ptr<BaseSystem>> systems_;
+  std::vector<std::unique_ptr<BaseSystem>> systems_;
 };
 
 }  // namespace entityx

@@ -127,6 +127,7 @@ public:
   void invalidate();
 
   Id id() const { return id_; }
+  EntityManager* manager() const { return manager_; }
 
   template <typename C, typename ... Args>
   ComponentHandle<C> assign(Args && ... args);

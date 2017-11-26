@@ -645,30 +645,6 @@ TEST_CASE_METHOD(EntityManagerFixture, "TestConstComponentsNotInstantiatedTwice"
   REQUIRE(b.component<const Position>()->y == 2);
 }
 
-TEST_CASE_METHOD(EntityManagerFixture, "TestEntityManagerEach") {
-  Entity a = em.create();
-  a.assign<Position>(1, 2);
-  int count = 0;
-  em.each<Position>([&count](Entity entity, Position &position) {
-    count++;
-    REQUIRE(position.x == 1);
-    REQUIRE(position.y == 2);
-  });
-  REQUIRE(count == 1);
-}
-
-TEST_CASE_METHOD(EntityManagerFixture, "TestViewEach") {
-  Entity a = em.create();
-  a.assign<Position>(1, 2);
-  int count = 0;
-  em.entities_with_components<Position>().each([&count](Entity entity, Position &position) {
-    count++;
-    REQUIRE(position.x == 1);
-    REQUIRE(position.y == 2);
-  });
-  REQUIRE(count == 1);
-}
-
 TEST_CASE_METHOD(EntityManagerFixture, "TestComponentDereference") {
   Entity a = em.create();
   a.assign<Position>(10, 5);

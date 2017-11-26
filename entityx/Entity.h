@@ -457,25 +457,8 @@ class EntityManager : entityx::help::NonCopyable {
     ComponentMask mask_;
   };
 
-  template <bool All, typename ... Components>
-  class TypedView: public BaseView<All> {
-  public:
-    template <typename T> struct identity { typedef T type; };
-
-    void each(typename identity<std::function<void(Entity entity, Components&...)>>::type f) {
-      for (auto it : *this)
-        f(it, *(it.template component<Components>().get())...);
-    }
-
-  private:
-    friend class EntityManager;
-
-    explicit TypedView(EntityManager *manager) : BaseView<All>(manager) {}
-    TypedView(EntityManager *manager, ComponentMask mask) : BaseView<All>(manager, mask) {}
-  };
-
-  template <typename ... Components> using View = TypedView<false, Components...>;
-  typedef BaseView<true> DebugView;
+  using View = BaseView<false>;
+  using DebugView = BaseView<true>;
 
   template <typename ... Components>
   class UnpackingView {
@@ -755,16 +738,9 @@ class EntityManager : entityx::help::NonCopyable {
    * @endcode
    */
   template <typename ... Components>
-  View<Components...> entities_with_components() {
+  View entities_with_components() {
     auto mask = component_mask<Components ...>();
-    return View<Components...>(this, mask);
-  }
-
-  template <typename T> struct identity { typedef T type; };
-
-  template <typename ... Components>
-  void each(typename identity<std::function<void(Entity entity, Components&...)>>::type f) {
-    return entities_with_components<Components...>().each(f);
+    return View(this, mask);
   }
 
   /**

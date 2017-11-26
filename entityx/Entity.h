@@ -743,6 +743,11 @@ class EntityManager : entityx::help::NonCopyable {
   }
 
   /**
+   * Find Entities that have all of the Components specified by the mask.
+   */
+  inline View entities_with_components(ComponentMask mask);
+
+  /**
    * Find Entities that have all of the specified Components and assign them
    * to the given parameters.
    *

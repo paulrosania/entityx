@@ -38,10 +38,6 @@ EntityManager::~EntityManager() {
   reset();
 }
 
-EntityManager::View EntityManager::entities_with_components(ComponentMask mask) {
-  return EntityManager::View(this, mask);
-}
-
 void EntityManager::reset() {
   for (Entity entity : entities_for_debugging()) entity.destroy();
   for (BasePool *pool : component_pools_) {

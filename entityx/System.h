@@ -85,6 +85,18 @@ class SystemManager {
                 entity_manager_(entity_manager),
                 event_manager_(event_manager) {}
   NONCOPYABLE(SystemManager);
+  SystemManager(SystemManager &&other) = default;
+  SystemManager& operator=(SystemManager &&rhs) noexcept {
+    initialized_ = rhs.initialized_;
+    // FIXME: DANGER DANGER! Moving a referenced object!
+    this->event_manager_ = std::move(rhs.event_manager_);
+    this->entity_manager_ = std::move(rhs.entity_manager_);
+    systems_ = std::move(rhs).systems_;
+
+    rhs.initialized_ = false;
+
+    return *this;
+  }
 
   /**
    * Add a System to the SystemManager.

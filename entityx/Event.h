@@ -101,9 +101,12 @@ class Receiver : public BaseReceiver {
  *
  * Subscriptions are automatically removed when receivers are destroyed..
  */
-class EventManager : entityx::help::NonCopyable {
+class EventManager {
  public:
   EventManager();
+  NONCOPYABLE(EventManager);
+  EventManager(EventManager &&other) = default;
+  EventManager& operator=(EventManager &&rhs) = default;
   virtual ~EventManager();
 
   /**

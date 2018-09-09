@@ -357,11 +357,26 @@ public:
 /**
  * Manages Entity::Id creation and component assignment.
  */
-class EntityManager : entityx::help::NonCopyable {
+class EntityManager {
  public:
   typedef std::bitset<entityx::MAX_COMPONENTS> ComponentMask;
 
   explicit EntityManager(EventManager &event_manager);
+  NONCOPYABLE(EntityManager);
+  EntityManager(EntityManager &&other) = default;
+  EntityManager& operator=(EntityManager &&rhs) noexcept {
+    // FIXME: DANGER DANGER! Moving a referenced object!
+    index_counter_ = rhs.index_counter_;
+    event_manager_ = std::move(rhs.event_manager_);
+    component_pools_ = std::move(rhs).component_pools_;
+    component_helpers_ = std::move(rhs).component_helpers_;
+    entity_component_mask_ = std::move(rhs).entity_component_mask_;
+    entity_version_ = std::move(rhs).entity_version_;
+    free_list_ = std::move(rhs).free_list_;
+
+    return *this;
+  }
+
   virtual ~EntityManager();
 
   /// An iterator over a view of the entities in an EntityManager.
